@@ -5,12 +5,12 @@ output_folder=$@/print
 
 preset="medium";
 threads=0;
-width=1920;
-bitrate="900k";
+width=720;
+bitrate="225k";
 
 
 processVideo () {
-	ffmpeg -y -i "$1" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v libx265 -preset $preset -b:v $bitrate -c:a libfdk_aac -b:a 192k -pass 1 -c:a copy -c:s copy -threads $threads -f matroska "$2";
+	ffmpeg -y -i "$1" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v libx265 -preset $preset -b:v $bitrate -c:a aac -b:a 192k -pass 1 -strict -2 -threads $threads -f matroska "$2";
 	#ffmpeg -i "$1" -vf scale="$width:trunc(ow/a/2)*2" -c:v libx264 -preset $preset -b:v $bitrate -p pass 2 -c:a copy -c:s copy -threads $threads -f matroska "$2";
 
 
