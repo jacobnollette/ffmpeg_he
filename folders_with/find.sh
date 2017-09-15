@@ -1,11 +1,34 @@
-
-#find $@ -type f -exec file -N -i -- {} + | grep video
-
+#!/bin/bash
 
 
-#find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p'
-find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p'
-#find "$@" -type f -exec file -N -i -- {} + | grep video
 
 
-# | xargs -I {} processVideo -c "{}";
+
+processVideo() {
+	echo "$@";
+	for item in "$@"; do
+		echo "bang $item";
+	done;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export -f processVideo;
+find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /_/g' | xargs bash -c 'processVideo "$@"'	
