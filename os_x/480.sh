@@ -60,4 +60,7 @@ processVideo480() {
 
 
 export -f processVideo480;
-find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo480 "$@"'
+find "$@" -type f -exec file -- '{}' + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo480 "$@"';
+#find "$@" -type f -exec file -N -i -- {} +
+#
+#
