@@ -12,7 +12,7 @@ processVideo() {
 	filenameExtension="mkv";
   filetype="matroska";
   audiocodec="aac";             # aac is alright
-  videocoder="libx265";         # always h265
+  videocodec="libx265";         # always h265
 	preset="medium";
 	threads=0;                    #unlimited threads
 	width=720;
@@ -52,7 +52,7 @@ processVideo() {
 		print_file="$print_file$filenameExtension";
 
     # strict 2 for aac, because it's experimental
-		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocondec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
+		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
 
 	done;
 
