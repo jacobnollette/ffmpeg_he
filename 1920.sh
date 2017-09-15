@@ -1,6 +1,6 @@
 #!/bin/bash
 
-processVideo() {
+processVideo1920() {
 
   # pass it a season or group folder.
   # it will go through the seasons, and process everything
@@ -59,5 +59,5 @@ processVideo() {
 }
 
 
-export -f processVideo;
-find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo "$@"'
+export -f processVideo1920;
+find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo1920 "$@"'
