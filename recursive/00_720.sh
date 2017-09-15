@@ -1,54 +1,63 @@
+#!/bin/bash
 
-preset="medium";
-threads=0;
-width=720;
-bitrate="225k";
+processVideo() {
+
+  # pass it a season or group folder.
+  # it will go through the seasons, and process everything
+  # creates a print folder in the group folder.
+
+  # find doesn't work the same on OS X;
+  # tested in ubuntu 16.04
+
+	filenameExtension="mkv";
+  filetype="matroska";
+  audiocodec="aac";             # aac is alright
+  videocoder="libx265";         # always h265
+	preset="medium";
+	threads=0;                    #unlimited threads
+	width=720;
+	videobitrate="225k";
+  soundBitrate="256k"
+
+	for item in "$@"; do
+		original_item=$item;
+		item="$( echo "$item" | sed 's/ /\\ /g' )";     # add escape characters
+
+		#	create proper file name, quotes will be needed
+		season_folder=`dirname "$item"`;
+		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";   #remove escape characters,- honestly I don't know why we had to do this
+
+		#	this is the series folder, parent to season
+		season_root=`dirname "$season_folder"`;
+
+		#	season folder - season name or number
+		season_parent_folder_name=`basename "$season_folder"`;
 
 
-processVideo () {
-	ffmpeg -y -i "$1" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v libx265 -preset $preset -b:v $bitrate -c:a aac -b:a 192k -pass 1 -strict -2 -c:s copy -threads $threads -f matroska "$2";
-	#ffmpeg -i "$1" -vf scale="$width:trunc(ow/a/2)*2" -c:v libx264 -preset $preset -b:v $bitrate -p pass 2 -c:a copy -c:s copy -threads $threads -f matroska "$2";
+		# create print folder;
+		cd "$season_root";
+		mkdir -p "print";
+		cd print;
+		mkdir -p "$season_parent_folder_name";
+		cd "$season_parent_folder_name";
+		print_dir=`pwd`;							#	here's our print directory
 
 
-	#ffmpeg -y -i "$1" -vf scale="$WIDTH:trunc(ow/a/2)*2" -c:v libx264 -preset $preset -b:v $bitrate -pass 1 -c:a copy -c:s copy -threads $threads -f matroska /dev/null && \
-	#ffmpeg -i "$1" -vf scale="$WIDTH:trunc(ow/a/2)*2" -c:v libx264 -preset $preset -b:v $bitrate -p pass 2 -c:a copy -c:s copy -threads $threads -f matroska "$2";
+		# get the filename without extension
+    filename=`basename "$item"`;
+		fn_no_extension=${filename%.*};
+
+    #generate print file
+		print_file="$print_dir/$fn_no_extension.";
+		print_file="$print_file$filenameExtension";
+
+    # strict 2 for aac, because it's experimental
+		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocondec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
+
+	done;
+
 }
 
-processFolder () {
-	for i in "$@"
-		do
-			the_base="$(pwd)";
-			the_base="$(basename "$the_base")";
-		#mkdir "$input_folder/../print/$the_base";
-			filename=`basename "$i"`;
-			t=${filename%.*};
-			print_file_name="$input_folder/../print/$the_base/$t.mkv";
-			echo "$i";
-		#processVideo "$i" "$print_file_name";
-	done
 
-}
-
-mkdir "$@/print";
-
-
-input_folder="$@"
-output_folder=$@/print
-mkdir $output_folder;
-
-for folder in "$input_folder/*"
-	do
-		season_folder="$folder";
-		cd $season_folder;
-		season_base="$(pwd)";
-		season_base="$(basename "$season_base")";
-
-
-		case "$season_base" in
-		    print);;
-		    *) processFolder "$folder";;
-		esac
-
-		#echo $season_base;
-
-	done
+export -f processVideo;
+find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo "$@"'
