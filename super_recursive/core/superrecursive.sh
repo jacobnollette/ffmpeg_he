@@ -82,7 +82,8 @@ processVideo() {
 		# strict 2 for aac, because it's experimental
 		#	width = width
 		#	height = round( output_width / ) #ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" \
-		ffmpeg -y -i "$original_item" -vf scale="-1:"$width"" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+		#ffmpeg -y -i "$original_item" -vf scale="-1:"$width""
 
 	done;
 
