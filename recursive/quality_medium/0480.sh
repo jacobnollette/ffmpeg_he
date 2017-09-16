@@ -12,7 +12,7 @@
 
 
 
-	source ../core/superrecursive.sh;
+	source ../../core/superrecursive.sh;
 
 	export -f processVideo;
 
