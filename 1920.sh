@@ -2,17 +2,17 @@
 
 processVideo1920() {
 
-  # pass it a season or group folder.
-  # it will go through the seasons, and process everything
-  # creates a print folder in the group folder.
+	# pass it a season or group folder.
+	# it will go through the seasons, and process everything
+	# creates a print folder in the group folder.
 
-  # find doesn't work the same on OS X;
-  # tested in ubuntu 16.04
+	# find doesn't work the same on OS X;
+	# tested in ubuntu 16.04
 
 	filenameExtension="mkv";
-  filetype="matroska";
-  audiocodec="aac";             # aac is alright
-  videocodec="libx265";         # always h265
+	filetype="matroska";
+	audiocodec="aac";             # aac is alright
+	videocodec="libx265";         # always h265
 	preset="medium";
 	threads=0;                    #unlimited threads
 	width=1920;
@@ -20,6 +20,7 @@ processVideo1920() {
   soundBitrate="256k"
 
 	for item in "$@"; do
+
 		original_item=$item;
 		item="$( echo "$item" | sed 's/ /\\ /g' )";     # add escape characters
 
@@ -44,14 +45,14 @@ processVideo1920() {
 
 
 		# get the filename without extension
-    filename=`basename "$item"`;
+		filename=`basename "$item"`;
 		fn_no_extension=${filename%.*};
 
-    #generate print file
+		#generate print file
 		print_file="$print_dir/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
 
-    # strict 2 for aac, because it's experimental
+		# strict 2 for aac, because it's experimental
 		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
 
 	done;
@@ -64,15 +65,15 @@ export -f processVideo1920;
 
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        #	linux-gnu
-				find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo1920 "$@"';
+	#	linux-gnu
+	find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo1920 "$@"';
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # Mac OSX
-				find "$@" -type f -exec file -- '{}' + | grep video | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo1920 "$@"';
+	#	Mac OSX
+	find "$@" -type f -exec file -- '{}' + | grep video | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo1920 "$@"';
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
-        #	Freebsd
-				echo "Not yes supported";
+	#	Freebsd
+	echo "Not yes supported";
 else
-        # Unknown.
-				echo "Not yes supported";
+	#	Unknown.
+	echo "Not yes supported";
 fi
