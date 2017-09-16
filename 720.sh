@@ -60,4 +60,17 @@ processVideo720() {
 
 
 export -f processVideo720;
-find "$@" -type f -exec file -- '{}' + | grep video | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo720 "$@"';
+
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        #	linux-gnu
+				find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo720 "$@"';
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # Mac OSX
+				find "$@" -type f -exec file -- '{}' + | grep video | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo720 "$@"';
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+        #	Freebsd
+				echo "Not yes supported";
+else
+        # Unknown.
+				echo "Not yes supported";
+fi
