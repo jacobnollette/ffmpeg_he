@@ -21,11 +21,13 @@ function processVideo480() {
 
 	for item in "$@"; do
 		original_item=$item;
-		item="$( echo "$item" | sed 's/ /\\ /g' )";     # add escape characters
+		# add escape characters
+		item="$( echo "$item" | sed 's/ /\\ /g' )";
 
 		#	create proper file name, quotes will be needed
 		season_folder=`dirname "$item"`;
-		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";   #remove escape characters,- honestly I don't know why we had to do this
+		#remove escape characters,- honestly I don't know why we had to do this
+		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
 
 		#	this is the series folder, parent to season
 		season_root=`dirname "$season_folder"`;
@@ -52,7 +54,9 @@ function processVideo480() {
 		print_file="$print_file$filenameExtension";
 
 		# strict 2 for aac, because it's experimental
-		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
+		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" \
+		-c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec \
+		-b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
 
 	done;
 

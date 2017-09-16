@@ -52,7 +52,9 @@ processVideo720() {
 		print_file="$print_file$filenameExtension";
 
 		# strict 2 for aac, because it's experimental
-		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec -b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
+		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" \
+		-c:v $videocodec -preset $preset -b:v $videobitrate -c:a $audiocodec \
+		-b:a $soundBitrate -pass 1 -strict -2 -threads $threads -f $filetype "$print_file";
 
 	done;
 
