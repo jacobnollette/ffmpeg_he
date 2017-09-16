@@ -63,6 +63,8 @@ processVideo720() {
 
 export -f processVideo720;
 
+find "$@" -type f | grep -E "\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo720 "$@"';
+:'
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	#	linux-gnu
 	find "$@" -type f -exec file -N -i -- {} + | sed -n 's!: video/[^:]*$!!p' | sed 's/ /\\ /g' | xargs bash -c 'processVideo720 "$@"';
@@ -76,3 +78,4 @@ else
 	# Unknown.
 	echo "Not yes supported";
 fi
+'
