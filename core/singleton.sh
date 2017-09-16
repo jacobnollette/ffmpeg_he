@@ -11,6 +11,7 @@ processVideo() {
 
 	#	here is our input folder;
 	rootItem="$1";
+	rootItem=`dirname $rootItem`;
 	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
 
 	filenameExtension="$2";
@@ -43,23 +44,9 @@ processVideo() {
 		#	this is the series folder, parent to season
 		season_root=`dirname "$original_item"`;
 		#echo $season_root;
+		print_folder="$season_root/print";
 
 		#	season folder - season name or number
-		season_parent_folder_name=`basename "$season_folder"`;
-		root_parent_folder=`basename "$rootItem"`;
-
-		if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
-			print_folder="$rootItem/print";
-		else
-
-			print_folder="$rootItem/print/$season_parent_folder_name";
-		fi
-
-		#	fucking os x
-		doubleBase=`basename "$print_folder"`;
-		if [[ "$doubleBase" == ".AppleDouble" ]]; then
-			print_folder=`dirname $print_folder`;
-		fi
 
 		#	create print folder
 		mkdir -p "$print_folder";
@@ -82,8 +69,9 @@ processVideo() {
 		# strict 2 for aac, because it's experimental
 		#	width = width
 		#	height = round( output_width / ) #ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" \
+		#echo $print_file
 		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
-		#ffmpeg -y -i "$original_item" -vf scale="-1:"$width""
+
 
 	#done;
 
