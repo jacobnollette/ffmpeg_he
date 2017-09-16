@@ -25,8 +25,9 @@ processVideo() {
 
 
 	#echo $rootItem;
-	for item in "${@:11}"; do
 
+	#for item in "${@:11}"; do
+		item=${11};
 		#	here is the found file
 		#echo "$item";
 		original_item=$item;
@@ -84,6 +85,6 @@ processVideo() {
 		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
 		#ffmpeg -y -i "$original_item" -vf scale="-1:"$width""
 
-	done;
+	#done;
 
 }
