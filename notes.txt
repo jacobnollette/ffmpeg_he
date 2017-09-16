@@ -1,3 +1,0 @@
-#this is how you kill rogue ffmpeg processes
-
-#ps -ef | grep "ray donovan" | cut -d " " -f 2 | xargs kill;
