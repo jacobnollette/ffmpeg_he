@@ -18,9 +18,10 @@ function processVideo480() {
 	width=480;
 	videobitrate="115k";
 	soundBitrate="256k"
-	echo "1 $1";
-	echo "2 $2";
-	for item in "$1"; do
+	
+
+	theItems="${@:2}";
+	for item in "$theItems"; do
 		original_item=$item;
 		# add escape characters
 		item="$( echo "$item" | sed 's/ /\\ /g' )";
