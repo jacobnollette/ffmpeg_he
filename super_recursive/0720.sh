@@ -88,7 +88,7 @@ processVideo720() {
 	}
 
 
-	export -f processVideo480;
+	export -f processVideo720;
 	sourceInput="$@";
 	export sourceInput;
 
