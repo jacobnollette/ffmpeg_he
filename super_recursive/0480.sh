@@ -75,7 +75,7 @@ function processVideo480() {
 		fn_no_extension=${filename%.*};
 
 		#generate print file
-		print_file="$print_folder/$fn_no_extension";
+		print_file="$print_folder/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
 
 		# strict 2 for aac, because it's experimental
