@@ -1,7 +1,7 @@
 source baseline.sh;
 source ../utilities.sh;
 
-multiplebitrate="1";
+multiplebitrate="2.66";
 videobitrate="$(echo $videobitrate*$multiplebitrate|bc -l)";
 videobitrate="$(round "$videobitrate" "0")";
 videobitrate="${videobitrate}k"
