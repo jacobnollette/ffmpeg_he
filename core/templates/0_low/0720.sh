@@ -8,6 +8,6 @@ filetype="matroska";
 videocodec="libx265";         # always h265
 audiocodec="aac";             # aac is alright
 audiobitrate="192k";
-preset="medium";
+#preset="medium";
 threads=0;                    #unlimited threads
 width=720;
