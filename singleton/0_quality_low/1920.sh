@@ -1,22 +1,8 @@
 #!/bin/bash
-filenameExtension="mkv";
-filetype="matroska";
-videocodec="libx265";         # always h265
-audiocodec="aac";             # aac is alright
-videobitrate="1000k";
-audiobitrate="256k"
-preset="medium";
-threads=0;                    #unlimited threads
-width=1920;
-
-
-
-
+source ../../core/templates/0_low/1920.sh;
 source ../../core/singleton.sh;
 
 export -f processVideo;
-
-
 
 #	here is out input stack
 export filenameExtension;
