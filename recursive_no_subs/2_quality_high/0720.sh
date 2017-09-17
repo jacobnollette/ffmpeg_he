@@ -5,7 +5,7 @@ size="0720";
 source ../../core/templates/$quality/baseline.sh;
 source ../../core/utilities.sh;
 source ../../core/templates/$quality/$size.sh;
-source ../../core/superrecurtive_no_subs.sh;
+source ../../core/superrecursive_no_subs.sh;
 
 export -f processVideo;
 
