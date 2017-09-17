@@ -1,6 +1,11 @@
 #!/bin/bash
-source ../../core/templates/1_medium/1280.sh;
-source ../../core/superrecursive.sh;
+quality="1_medium";
+size="1280";
+
+source ../../core/templates/$quality/baseline.sh;
+source ../../core/utilities.sh;
+source ../../core/templates/$quality/$size.sh;
+source ../../core/singleton.sh;
 
 export -f processVideo;
 

@@ -1,6 +1,3 @@
-source baseline.sh;
-source ../utilities.sh;
-
 multiplebitrate="1";
 videobitrate="$(echo $videobitrate*$multiplebitrate|bc -l)";
 videobitrate="$(round "$videobitrate" "0")";

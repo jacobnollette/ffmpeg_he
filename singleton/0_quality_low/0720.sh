@@ -1,5 +1,10 @@
 #!/bin/bash
-source ../../core/templates/0_low/0720.sh;
+quality="0_low";
+size="0720";
+
+source ../../core/templates/$quality/baseline.sh;
+source ../../core/utilities.sh;
+source ../../core/templates/$quality/$size.sh;
 source ../../core/singleton.sh;
 
 export -f processVideo;

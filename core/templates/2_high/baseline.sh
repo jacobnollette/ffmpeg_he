@@ -1,1 +1,1 @@
-videobitrate="330";
+videobitrate="300";
