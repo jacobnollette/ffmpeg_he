@@ -1,22 +1,8 @@
 #!/bin/bash
-filenameExtension="mkv";
-filetype="matroska";
-videocodec="libx265";         # always h265
-audiocodec="aac";             # aac is alright
-videobitrate="1500k";
-audiobitrate="256k"
-preset="medium";
-threads=0;                    #unlimited threads
-width=1920;
-
-
-
-
+source ../../core/templates/1_medium/1920.sh;
 source ../../core/superrecursive.sh;
 
 export -f processVideo;
-
-
 
 #	here is out input stack
 export filenameExtension;
