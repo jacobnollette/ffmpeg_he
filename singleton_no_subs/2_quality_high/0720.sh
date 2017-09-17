@@ -15,7 +15,8 @@ export filetype;
 export videocodec;
 export audiocodec;
 export videobitrate;
-export audiobitrate;
+export audiobitrate; 
+export audiosamplerate;
 export preset;
 export threads;
 export width;
@@ -25,4 +26,4 @@ export width;
 sourceInput="$@";
 export sourceInput;
 
-processVideo "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$preset" "$threads" "$width" "$sourceInput";
+processVideo "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$sourceInput";
