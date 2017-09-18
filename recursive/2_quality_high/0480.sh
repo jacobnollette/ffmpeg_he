@@ -5,7 +5,7 @@ size="0480";
 source ../../core/templates/$quality/baseline.sh;
 source ../../core/utilities.sh;
 source ../../core/templates/$quality/$size.sh;
-source ../../core/singleton.sh;
+source ../../core/superrecursive.sh;
 
 export -f processVideo;
 
@@ -15,7 +15,7 @@ export filetype;
 export videocodec;
 export audiocodec;
 export videobitrate;
-export audiobitrate; 
+export audiobitrate;
 export audiosamplerate;
 export preset;
 export threads;
@@ -26,4 +26,4 @@ export width;
 sourceInput="$@";
 export sourceInput;
 
-find "$sourceInput" -type f | grep -E "\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | xargs bash -c 'processVideo "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$@"';
+find "$sourceInput" -type f | grep -E "\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | xargs bash -c 'processVideo "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$@"';
