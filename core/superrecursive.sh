@@ -24,13 +24,14 @@ processVideo() {
 	threads="${10}";
 	width="${11}";
 
-
 	#echo $rootItem;
 	for item in "${@:12}"; do
 
 		#	here is the found file
 		#echo "$item";
 		original_item=$item;
+		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
+
 		# add escape characters
 		item="$( echo "$item" | sed 's/ /\\ /g' )";
 
@@ -82,6 +83,7 @@ processVideo() {
 		# strict 2 for aac, because it's experimental
 		#	width = width
 		#	height = round( output_width / ) #ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" \
+
 		ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
 		#ffmpeg -y -i "$original_item" -vf scale="-1:"$width""
 

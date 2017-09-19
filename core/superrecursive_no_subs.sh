@@ -31,6 +31,7 @@ processVideo() {
 		#	here is the found file
 		#echo "$item";
 		original_item=$item;
+		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
 		# add escape characters
 		item="$( echo "$item" | sed 's/ /\\ /g' )";
 
