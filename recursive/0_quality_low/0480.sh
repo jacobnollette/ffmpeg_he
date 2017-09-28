@@ -24,6 +24,13 @@ export width;
 
 #	pass out root input as a variables
 sourceInput="$@";
+find "$sourceInput" -depth -name ".DS_Store" -exec rm {} \;
+find "$sourceInput" -depth -name ".AppleDouble" -exec rm -Rf {} \;
+
+find "$sourceInput" -depth -name ".DS_Store" -exec rm {} \;
+find "$sourceInput" -depth -name ".AppleDouble" -exec rm -Rf {} \;
+
+
 export sourceInput;
 
 find "$sourceInput" -type f -not -path "*/print*" -not -path "*/print*" | grep -E "\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; processVideo "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "${my_array[@]}"; };
