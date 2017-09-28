@@ -128,10 +128,10 @@ _process_recursive() {
 			if [ "$subtitles" = true ];
 				then
 					#	with subtitles
-					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
 				else
 					#	without subtitles
-					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
 			fi
 		fi;
 
