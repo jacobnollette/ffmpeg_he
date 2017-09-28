@@ -186,7 +186,7 @@ case "$quality" in
 	low)
 		videobitrate="190";
 		audiocodec="aac";
-		audiobitrate="192k";
+		audiobitrate="256k";
 		audiosamplerate="44100";
 		preset="medium";
 		;;
