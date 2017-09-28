@@ -57,13 +57,13 @@ processVideo() {
 		fi
 
 		#	fucking os x
-		doubleBase=`basename "$print_folder"`;
-		if [[ "$doubleBase" == ".AppleDouble" ]]; then
-			print_folder=`dirname $print_folder`;
-		fi
+		#doubleBase=`basename "$print_folder"`;
+		#if [[ "$doubleBase" == ".AppleDouble" ]]; then
+		#	print_folder=`dirname $print_folder`;
+		#fi
 
 		#	create print folder
-		mkdir -p "$print_folder";
+
 		#echo $print_folder;
 		#echo $season_parent_folder_name;
 		#echo $season_parent_folder_name;
@@ -83,6 +83,7 @@ processVideo() {
 		# strict 2 for aac, because it's experimental
 
 		if [ ! -f "$print_file" ]; then
+			mkdir -p "$print_folder";
 			ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
 		fi;
 
