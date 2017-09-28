@@ -1,0 +1,255 @@
+#!/bin/bash
+
+
+
+
+
+
+_utility_readme() {
+	echo "-s subtitles(true / false)";
+	echo "-i image width (1920)";
+	echo "-q quality (low / medium / high)";
+	echo "-f files (directory or file)";
+}
+_utility_round() {
+    # $1 is expression to round (should be a valid bc expression)
+    # $2 is number of decimal figures (optional). Defaults to three if none given
+    local df=${2:-3}
+    printf '%.*f\n' "$df" "$(bc -l <<< "a=$1; if(a>0) a+=5/10^($df+1) else if (a<0) a-=5/10^($df+1); scale=$df; a/1")"
+}
+
+_utility_video_dimensions () {
+
+  eval $(ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width "$@");
+  size=${streams_stream_0_width}x${streams_stream_0_height};
+  echo $size;
+}
+
+_utility_dot_clean() {
+	find "$@" -depth -name ".DS_Store" -exec rm {} \;
+	find "$@" -depth -name ".AppleDouble" -exec rm -Rf {} \;
+}
+
+
+
+_process_recursive() {
+
+	#	here is our input folder;
+	rootItem="$1";
+	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
+
+	filenameExtension="$2";
+	filetype="$3";
+	videocodec="$4";
+	audiocodec="$5";
+	videobitrate="$6";
+	audiobitrate="$7";
+	audiosamplerate="$8"
+	preset="$9";
+	threads="${10}";
+	width="${11}";
+	subtitles="${12}";
+
+	for item in "${@:13}"; do
+
+
+		# multiplebitrate="1";
+		# videobitrate="$(echo $videobitrate*$multiplebitrate|bc -l)";
+		# videobitrate="$(_utility_round "$videobitrate" "0")";
+		# videobitrate="${videobitrate}k"
+
+
+
+		#	here is the found file
+		original_item=$item;
+		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
+
+
+
+
+
+		# add escape characters
+		item="$( echo "$item" | sed 's/ /\\ /g' )";
+
+
+		#	create proper file name, quotes will be needed
+		season_folder=`dirname "$item"`;
+
+		#remove escape characters,- honestly I don't know why we had to do this
+		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
+
+		#	this is the series folder, parent to season
+		season_root=`dirname "$original_item"`;
+
+		#	season folder - season name or number
+		season_parent_folder_name=`basename "$season_folder"`;
+		root_parent_folder=`basename "$rootItem"`;
+
+		if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
+			print_folder="$rootItem/print";
+		else
+
+			print_folder="$rootItem/print/$season_parent_folder_name";
+		fi
+
+
+		# get the filename without extension
+		filename=`basename "$original_item"`;
+		fn_no_extension=${filename%.*};
+
+		#generate print file
+		print_file="$print_folder/$fn_no_extension.";
+		print_file="$print_file$filenameExtension";
+
+
+
+		#	specs
+		if ! [ -z ${width+x} ];
+			then
+
+				video_dimensions=$(_utility_video_dimensions "$original_item")
+				video_width=$( echo $video_dimensions | cut -d 'x' -f 1 );
+				width=$video_width;
+		fi;
+
+		bitratemultiplier=$(($width/480));
+		bitratemultiplier="$(_utility_round "$bitratemultiplier" "0")";
+		_the_videobitrate=$(($videobitrate * $bitratemultiplier));
+		_the_videobitrate="${_the_videobitrate}k";
+
+
+
+
+		# strict 2 for aac, because it's experimental
+		if [ ! -f "$print_file" ]; then
+
+			mkdir -p "$print_folder";
+
+			if [ "$subtitles" = true ];
+				then
+					#	with subtitles
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+				else
+					#	without subtitles
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+			fi
+		fi;
+
+	done;
+
+}
+
+
+
+
+
+subtitles='true';
+imagewidth='false';
+quality='low';
+files="";
+
+if [ $# -eq 0 ]
+  then
+		echo " ";
+		_utility_readme;
+		echo " ";
+		exit 1;
+fi
+while getopts ':s:i:q:f:' flag; do
+  case "${flag}" in
+    s) subtitles="${OPTARG}" ;;
+    i) imagewidth="${OPTARG}" ;;
+    q) quality="${OPTARG}" ;;
+    f) files="$OPTARG" ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
+
+if [ -z ${files+x} ];
+	then
+		echo " ";
+		echo "Please provide files";
+		echo " ";
+		_utility_readme;
+		echo " "
+		exit 1;
+fi;
+
+
+
+#	low - 190, audio 192k, 44100k
+#	medium - 215, audio 256k, 44100k
+# high - 240, audio 320k, bitrate 48000k
+
+
+case "$quality" in
+	low)
+		videobitrate="190";
+		audiocodec="aac";
+		audiobitrate="192k";
+		audiosamplerate="44100";
+		preset="medium";
+		;;
+	medium)
+		videobitrate="215";
+		audiocodec="aac";
+		audiobitrate="256k";
+		audiosamplerate="44100";
+		preset="slow";
+		;;
+	high)
+		videobitrate="240";
+		audiocodec="aac";
+		audiobitrate="320k";
+		audiosamplerate="48000";
+		preset="slow";
+		;;
+	*)
+		echo " ";
+		echo "Wrong file quality";
+		echo " ";
+		_utility_readme;
+		echo " "
+		exit 1;
+		;;
+esac;
+
+
+
+
+
+filenameExtension="mkv";
+filetype="matroska";
+videocodec="libx265";         # always h265
+threads=0;                    #unlimited threads
+
+
+
+
+
+
+
+
+
+
+
+export -f _process_recursive;
+
+#	pass out root input as a variables
+sourceInput="$files";
+echo $sourceInput;
+
+export filenameExtension;
+export filetype;
+export videocodec;
+export audiocodec;
+export videobitrate;
+export audiobitrate;
+export audiosamplerate;
+export preset;
+export threads;
+export width;
+export subtitles;
+export sourceInput;
+
+find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
