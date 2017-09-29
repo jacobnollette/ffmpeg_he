@@ -52,25 +52,12 @@ _process_recursive() {
 
 	for item in "${@:13}"; do
 
-
-		# multiplebitrate="1";
-		# videobitrate="$(echo $videobitrate*$multiplebitrate|bc -l)";
-		# videobitrate="$(_utility_round "$videobitrate" "0")";
-		# videobitrate="${videobitrate}k"
-
-
-
 		#	here is the found file
 		original_item=$item;
 		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
 
-
-
-
-
 		# add escape characters
 		item="$( echo "$item" | sed 's/ /\\ /g' )";
-
 
 		#	create proper file name, quotes will be needed
 		season_folder=`dirname "$item"`;
@@ -85,13 +72,12 @@ _process_recursive() {
 		season_parent_folder_name=`basename "$season_folder"`;
 		root_parent_folder=`basename "$rootItem"`;
 
+		#	if root parent folder
 		if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
 			print_folder="$rootItem/print";
 		else
-
 			print_folder="$rootItem/print/$season_parent_folder_name";
 		fi
-
 
 		# get the filename without extension
 		filename=`basename "$original_item"`;
@@ -101,12 +87,9 @@ _process_recursive() {
 		print_file="$print_folder/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
 
-
-
 		#	specs
 		if ! [ -z ${width+x} ];
 			then
-
 				video_dimensions=$(_utility_video_dimensions "$original_item")
 				video_width=$( echo $video_dimensions | cut -d 'x' -f 1 );
 				width=$video_width;
@@ -117,14 +100,9 @@ _process_recursive() {
 		_the_videobitrate=$(($videobitrate * $bitratemultiplier));
 		_the_videobitrate="${_the_videobitrate}k";
 
-
-
-
 		# strict 2 for aac, because it's experimental
 		if [ ! -f "$print_file" ]; then
-
 			mkdir -p "$print_folder";
-
 			if [ "$subtitles" = true ];
 				then
 					#	with subtitles
@@ -138,6 +116,91 @@ _process_recursive() {
 	done;
 
 }
+
+
+_process_singleton () {
+
+		# pass it a season or group folder.
+		# it will go through the seasons, and process everything
+		# creates a print folder in the group folder.
+
+		#	here is our input folder;
+		rootItem="$1";
+		rootItem="$(dirname "$1")";
+		rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
+
+		filenameExtension="$2";
+		filetype="$3";
+		videocodec="$4";
+		audiocodec="$5";
+		videobitrate="$6";
+		audiobitrate="$7";
+		audiosamplerate="$8";
+		preset="$9";
+		threads="${10}";
+		width="${11}";
+		subtitles="${12}"
+
+		#	here is the found file
+		item=${13};
+		original_item=$item;
+
+		# add escape characters
+		item="$( echo "$item" | sed 's/ /\\ /g' )";
+
+		#	create proper file name, quotes will be needed
+		season_folder=`dirname "$item"`;
+
+		#remove escape characters,- honestly I don't know why we had to do this
+		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
+
+		#	this is the series folder, parent to season
+		season_root=`dirname "$original_item"`;
+
+		print_folder="$season_root/print";
+
+		#	create print folder
+		mkdir -p "$print_folder";
+
+		# get the filename without extension
+		filename=`basename "$original_item"`;
+		fn_no_extension=${filename%.*};
+
+		#generate print file
+		print_file="$print_folder/$fn_no_extension.";
+		print_file="$print_file$filenameExtension";
+
+
+
+		#	video width
+		if ! [ -z ${width+x} ];
+			then
+				video_dimensions=$(_utility_video_dimensions "$original_item")
+				video_width=$( echo $video_dimensions | cut -d 'x' -f 1 );
+				width=$video_width;
+		fi;
+
+		# video bitrate calculator
+		bitratemultiplier=$(($width/480));
+		bitratemultiplier="$(_utility_round "$bitratemultiplier" "0")";
+		_the_videobitrate=$(($videobitrate * $bitratemultiplier));
+		_the_videobitrate="${_the_videobitrate}k";
+
+		#	if we have subtitles
+		if [ "$subtitles" = true ];
+			then
+				#	with subtitles
+				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+			else
+				#	without subtitles
+				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+		fi
+
+}
+
+
+
+
 
 
 
@@ -237,7 +300,7 @@ export -f _process_recursive;
 
 #	pass out root input as a variables
 sourceInput="$files";
-echo $sourceInput;
+#echo $sourceInput;
 
 export filenameExtension;
 export filetype;
@@ -252,6 +315,16 @@ export width;
 export subtitles;
 export sourceInput;
 
-_utility_dot_clean "$sourceInput";
 
-find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
+
+if [[ -d "$sourceInput" ]]; then
+	#	we have a directory
+	_utility_dot_clean "$sourceInput";
+	find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
+elif [[ -f "$sourceInput" ]]; then
+	_process_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$sourceInput";
+	#echo "bang";
+else
+	echo "$sourceInput is not valid";
+	exit 1;
+fi
