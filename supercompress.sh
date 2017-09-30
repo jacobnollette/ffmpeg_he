@@ -62,42 +62,21 @@ _process_recursive() {
 		#	create proper file name, quotes will be needed
 		season_folder=`dirname "$item"`;
 
-		#remove escape characters,- honestly I don't know why we had to do this
+		#	remove escape characters,- honestly I don't know why we had to do this
+		#	not sure if we use this anymore
 		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
 		season_folder="$( echo "$season_folder" | tr -d '"' )";
 
+		#	get filepath of the given item
 		the_directory_of_the_file=$(dirname "$original_item");
 
-
-
+		# generate the recusive folder, based on given root
 		suffix_folder=$(echo $the_directory_of_the_file | sed "s@$rootItem@@g");
 		print_folder="$rootItem/print$suffix_folder";
 
-		echo "--------------";
-		echo "original item - $original_item";
-		echo "directory of the file - $the_directory_of_the_file";
-		echo "suffix folder - $suffix_folder";
-		echo "print folder - $print_folder";
-		# echo "season folder - $season_folder";
-
-
-
 		#	this is the series folder, parent to season
+		#	not sure if we use this anymore...
 		season_root=`dirname "$original_item"`;
-
-		#	season folder - season name or number
-		#season_parent_folder_name=`basename "$season_folder"`;
-		#root_parent_folder=`basename "$rootItem"`;
-
-		#	if root parent folder
-		#if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
-			#print_folder="$rootItem/print";
-		#else
-			#print_folder="$rootItem/print/$season_parent_folder_name";
-		#fi
-		#print_folder="$rootItem/print/$suffix_folder";
-		echo "print folder - $print_folder";
-
 
 		# get the filename without extension
 		filename=`basename "$original_item"`;
@@ -106,7 +85,7 @@ _process_recursive() {
 		#generate print file
 		print_file="$print_folder/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
-		echo "print file - $print_file";
+
 		#	specs
 		if ! [ -z ${width+x} ];
 			then
@@ -190,8 +169,6 @@ _process_singleton () {
 		print_file="$print_folder/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
 
-
-
 		#	video width
 		if ! [ -z ${width+x} ];
 			then
@@ -220,12 +197,7 @@ _process_singleton () {
 
 
 
-
-
-
-
-
-
+#	defaults
 subtitles='true';
 imagewidth='false';
 quality='low';
@@ -259,10 +231,12 @@ if [ -z ${files+x} ];
 fi;
 
 
-
-#	low - 190, audio 192k, 44100k
-#	medium - 215, audio 256k, 44100k
-# high - 240, audio 320k, bitrate 48000k
+#	template defaults
+#	these are the baseline figure for 480 wide
+#	multiplied accordingly
+	#	low - 190, audio 256k, 44100k
+	#	medium - 215, audio 256k, 44100k
+	# high - 240, audio 320k, bitrate 48000k
 
 
 case "$quality" in
@@ -297,22 +271,11 @@ case "$quality" in
 		;;
 esac;
 
-
-
-
-
+#	global defaults
 filenameExtension="mkv";
 filetype="matroska";
 videocodec="libx265";         # always h265
 threads=0;                    #unlimited threads
-
-
-
-
-
-
-
-
 
 
 
