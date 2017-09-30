@@ -265,6 +265,67 @@ _process_audio_recursive () {
 
 }
 
+
+
+_process_audio_singleton () {
+
+	rootItem="$1";
+	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
+
+	filenameExtension="$2";
+	audioCodec="$3";
+	audioProfile="$4";
+	audioSamplerate="$5";
+	audioChannels="$6";
+	audioBitrate="$7";
+	threads="$8"
+
+	item=${9};
+	original_item=$item;
+
+	# add escape characters
+	item="$( echo "$item" | sed 's/ /\\ /g' )";
+
+	#	create proper file name, quotes will be needed
+	season_folder=`dirname "$item"`;
+
+	#remove escape characters,- honestly I don't know why we had to do this
+	season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
+
+	#	this is the series folder, parent to season
+	season_root=`dirname "$original_item"`;
+
+	print_folder="$season_root/print";
+
+	#	create print folder
+	mkdir -p "$print_folder";
+
+	# get the filename without extension
+	filename=`basename "$original_item"`;
+	fn_no_extension=${filename%.*};
+
+	#generate print file
+	print_file="$print_folder/$fn_no_extension.";
+	print_file="$print_file$filenameExtension";
+
+	if [ ! -f "$print_file" ]; then
+
+		mkdir -p "$print_folder";
+
+		filenameExtension="$2";
+		audioCodec="$3";
+		audioProfile="$4";
+		audioSamplerate="$5";
+		audioChannels="$6";
+		audioBitrate="$7";
+		threads="$8"
+
+		ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+
+	fi;
+
+}
+
 #	defaults
 isAudio="false";
 subtitles='true';
@@ -414,7 +475,7 @@ else
 
 	elif [[ -f "$sourceInput" ]]; then
 		#	we have a file
-		echo "we have a file";
+		_process_audio_singleton "$sourceInput" "$audioFilenameExtension" "$audioAudioCodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiochannels" "$audioaudiobitrate" "$threads" "$sourceInput"; 
 	else
 		echo "$sourceInput is not valid";
 		exit 1;
