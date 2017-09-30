@@ -64,20 +64,40 @@ _process_recursive() {
 
 		#remove escape characters,- honestly I don't know why we had to do this
 		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
+		season_folder="$( echo "$season_folder" | tr -d '"' )";
+
+		the_directory_of_the_file=$(dirname "$original_item");
+
+
+
+		suffix_folder=$(echo $the_directory_of_the_file | sed "s@$rootItem@@g");
+		print_folder="$rootItem/print$suffix_folder";
+
+		echo "--------------";
+		echo "original item - $original_item";
+		echo "directory of the file - $the_directory_of_the_file";
+		echo "suffix folder - $suffix_folder";
+		echo "print folder - $print_folder";
+		# echo "season folder - $season_folder";
+
+
 
 		#	this is the series folder, parent to season
 		season_root=`dirname "$original_item"`;
 
 		#	season folder - season name or number
-		season_parent_folder_name=`basename "$season_folder"`;
-		root_parent_folder=`basename "$rootItem"`;
+		#season_parent_folder_name=`basename "$season_folder"`;
+		#root_parent_folder=`basename "$rootItem"`;
 
 		#	if root parent folder
-		if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
-			print_folder="$rootItem/print";
-		else
-			print_folder="$rootItem/print/$season_parent_folder_name";
-		fi
+		#if [[ "$season_parent_folder_name" == "$root_parent_folder" ]]; then
+			#print_folder="$rootItem/print";
+		#else
+			#print_folder="$rootItem/print/$season_parent_folder_name";
+		#fi
+		#print_folder="$rootItem/print/$suffix_folder";
+		echo "print folder - $print_folder";
+
 
 		# get the filename without extension
 		filename=`basename "$original_item"`;
@@ -86,7 +106,7 @@ _process_recursive() {
 		#generate print file
 		print_file="$print_folder/$fn_no_extension.";
 		print_file="$print_file$filenameExtension";
-
+		echo "print file - $print_file";
 		#	specs
 		if ! [ -z ${width+x} ];
 			then
@@ -100,7 +120,7 @@ _process_recursive() {
 		_the_videobitrate=$(($videobitrate * $bitratemultiplier));
 		_the_videobitrate="${_the_videobitrate}k";
 
-		# strict 2 for aac, because it's experimental
+		#strict 2 for aac, because it's experimental
 		if [ ! -f "$print_file" ]; then
 			mkdir -p "$print_folder";
 			if [ "$subtitles" = true ];
