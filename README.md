@@ -1,14 +1,13 @@
 # ffmpeg-h265
 
-Bunch of scripts for batching season folders recursively into h265.
-Handy script for killing rogue processes, since ctrl-c doesn't work well with this deep of a loop.
+This script has come a long way... And it's much dryier then past iterations. Now it's basically one file for video. Audio coming soon.
 
-#### Schemes
-* 480 - 100%
-* 720 - 150%
-* 1280 - 266.6%
-* 1920 - 400%
+##	Flags
+Really the only required flag is -f
+Flags and defaults below
 
-#### Notes
+*	-s (true / false) - defaults true
+* -i (image width) - defaults to autosize to current size
+* -q (quality, low, medium, high) - defaults to low, which is pretty good IMO. 256k or greater audio quality.
+* -f (pass it a file path) - must be absolute path
 
-* 0720_medium @575k - basically comperable to h264
