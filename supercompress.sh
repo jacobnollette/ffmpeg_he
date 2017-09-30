@@ -32,7 +32,7 @@ _utility_dot_clean() {
 
 
 
-_process_recursive() {
+_process_video_recursive() {
 
 	#	here is our input folder;
 	rootItem="$1";
@@ -117,7 +117,7 @@ _process_recursive() {
 }
 
 
-_process_singleton () {
+_process_video_singleton () {
 
 		# pass it a season or group folder.
 		# it will go through the seasons, and process everything
@@ -195,9 +195,78 @@ _process_singleton () {
 
 }
 
+_process_audio_recursive () {
 
+	rootItem="$1";
+	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
+
+	filenameExtension="$2";
+	audioCodec="$3";
+	audioProfile="$4";
+	audioSamplerate="$5";
+	audioChannels="$6";
+	audioBitrate="$7";
+	threads="$8"
+
+	for item in "${@:9}"; do
+
+		#	here is the found file
+		original_item=$item;
+		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
+
+		# add escape characters
+		item="$( echo "$item" | sed 's/ /\\ /g' )";
+
+		#	create proper file name, quotes will be needed
+		season_folder=`dirname "$item"`;
+
+		#	remove escape characters,- honestly I don't know why we had to do this
+		#	not sure if we use this anymore
+		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
+		season_folder="$( echo "$season_folder" | tr -d '"' )";
+
+		#	get filepath of the given item
+		the_directory_of_the_file=$(dirname "$original_item");
+
+		# generate the recusive folder, based on given root
+		suffix_folder=$(echo $the_directory_of_the_file | sed "s@$rootItem@@g");
+		print_folder="$rootItem/print$suffix_folder";
+
+		#	this is the series folder, parent to season
+		#	not sure if we use this anymore...
+		season_root=`dirname "$original_item"`;
+
+		# get the filename without extension
+		filename=`basename "$original_item"`;
+		fn_no_extension=${filename%.*};
+
+		#generate print file
+		print_file="$print_folder/$fn_no_extension.";
+		print_file="$print_file$filenameExtension";
+
+		#strict 2 for aac, because it's experimental
+		if [ ! -f "$print_file" ]; then
+
+			mkdir -p "$print_folder";
+
+			filenameExtension="$2";
+			audioCodec="$3";
+			audioProfile="$4";
+			audioSamplerate="$5";
+			audioChannels="$6";
+			audioBitrate="$7";
+			threads="$8"
+
+			ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+
+		fi;
+
+	done;
+
+}
 
 #	defaults
+isAudio="false";
 subtitles='true';
 imagewidth='false';
 quality='low';
@@ -210,8 +279,9 @@ if [ $# -eq 0 ]
 		echo " ";
 		exit 1;
 fi
-while getopts ':s:i:q:f:' flag; do
+while getopts ':s:i:q:f:a:' flag; do
   case "${flag}" in
+		a) isAudio="${OPTARG}" ;;
     s) subtitles="${OPTARG}" ;;
     i) imagewidth="${OPTARG}" ;;
     q) quality="${OPTARG}" ;;
@@ -242,24 +312,33 @@ fi;
 case "$quality" in
 	low)
 		videobitrate="190";
-		audiocodec="aac";
-		audiobitrate="256k";
+		audiovideocodec="aac";
+		audiovideobitrate="256k";
 		audiosamplerate="44100";
 		preset="medium";
+		audioaudiosamplerate="44100";
+		audioaudiochannels="2";
+		audioaudiobitrate="256k";
 		;;
 	medium)
 		videobitrate="215";
-		audiocodec="aac";
-		audiobitrate="256k";
+		audiovideocodec="aac";
+		audiovideobitrate="256k";
 		audiosamplerate="44100";
 		preset="slow";
+		audioaudiosamplerate="44100";
+		audioaudiochannels="2";
+		audioaudiobitrate="256k";
 		;;
 	high)
 		videobitrate="240";
-		audiocodec="aac";
-		audiobitrate="320k";
+		audiovideocodec="aac";
+		audiovideobitrate="320k";
 		audiosamplerate="48000";
 		preset="slow";
+		audioaudiosamplerate="44100";
+		audioaudiochannels="2";
+		audioaudiobitrate="320k";
 		;;
 	*)
 		echo " ";
@@ -273,13 +352,20 @@ esac;
 
 #	global defaults
 filenameExtension="mkv";
+
+audioFilenameExtension="m4a";
+audioAudioCodec="libfdk_aac";
+audioAudioProfile="aac_he_v2";
+
+
 filetype="matroska";
 videocodec="libx265";         # always h265
 threads=0;                    #unlimited threads
 
 
 
-export -f _process_recursive;
+export -f _process_video_recursive;
+export -f _process_video_singleton;
 
 #	pass out root input as a variables
 sourceInput="$files";
@@ -288,9 +374,9 @@ sourceInput="$files";
 export filenameExtension;
 export filetype;
 export videocodec;
-export audiocodec;
+export audiovideocodec;
 export videobitrate;
-export audiobitrate;
+export audiovideobitrate;
 export audiosamplerate;
 export preset;
 export threads;
@@ -298,16 +384,39 @@ export width;
 export subtitles;
 export sourceInput;
 
+#	audio
+export audioFilenameExtension;
+export audioAudioCodec;
+export audioAudioProfile;
+export audioaudiosamplerate;
+export audioaudiochannels;
+export audioaudiobitrate;
 
 
-if [[ -d "$sourceInput" ]]; then
-	#	we have a directory
-	_utility_dot_clean "$sourceInput";
-	find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
-elif [[ -f "$sourceInput" ]]; then
-	_process_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiocodec" "$videobitrate" "$audiobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$sourceInput";
-	#echo "bang";
+if [ "$isAudio" = "false" ]; then
+	if [[ -d "$sourceInput" ]]; then
+		#	we have a directory
+		_utility_dot_clean "$sourceInput";
+		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_video_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
+	elif [[ -f "$sourceInput" ]]; then
+		_process_video_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$sourceInput";
+		#echo "bang";
+	else
+		echo "$sourceInput is not valid";
+		exit 1;
+	fi
 else
-	echo "$sourceInput is not valid";
-	exit 1;
+	#	we're rocking audio
+	if [[ -d "$sourceInput" ]]; then
+		#	we have a directory
+		_utility_dot_clean "$sourceInput";
+		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.3gp$|\.aa$|\.aac$|\.aax$|\.act$|\.aiff$|\.amr$|\.ape$|\.au$|\.awb$|\.dct$|\.dss$|\.dvf$|\.flac$|\.gsm$|\.iklax$|\.ivs$|/.m4a$|\.m4b$|\.m4p$|\.mmf$|\.mp3$|\.mpc$|\.msv$|\.ogg$|\.oga$|\.opus$|\.ra$|\.rm$|\.raw$|\.sln$|\.tta$|\.vox$|\.wav$|\.wma$|\.wv$|\.webm$|\.8svx$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_audio_recursive "$sourceInput" "$audioFilenameExtension" "$audioAudioCodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiochannels" "$audioaudiobitrate" "$threads" "${my_array[@]}"; };
+
+	elif [[ -f "$sourceInput" ]]; then
+		#	we have a file
+		echo "we have a file";
+	else
+		echo "$sourceInput is not valid";
+		exit 1;
+	fi
 fi
