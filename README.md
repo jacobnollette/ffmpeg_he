@@ -15,7 +15,7 @@ Every video file will be compressed in HEVC, H265. So basically the same quality
 
 ##	Building ffmpeg
 ####	OS X
-`brew install --with-x265 --with-fdk-acc`
+`brew install ffmpeg --with-x265 --with-fdk-acc`
 ####	Ubuntu 16.04
 ```sudo apt-get -y install cifs-util tmux vim iotop iftop htop openvpn
 sudo apt-get -y install autoconf automake build-essential libass-dev libfreetype6-dev libtheora-dev libtool libvorbis-dev pkg-config texinfo zlib1g-dev
