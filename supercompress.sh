@@ -442,7 +442,7 @@ audiovideocodec="aac";	#	we don't use this anymore
 audioFilenameExtension="m4a";
 audioAudioCodec="libfdk_aac";
 audioAudioProfile="aac_he_v2";
-audioVideoProfile="aac_he_v1";
+audioVideoProfile="aac_he";
 
 
 filetype="matroska";
