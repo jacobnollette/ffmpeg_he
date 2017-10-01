@@ -50,7 +50,13 @@ _process_video_recursive() {
 	width="${11}";
 	subtitles="${12}";
 
-	for item in "${@:13}"; do
+	audioAudioCodec="${13}";
+	audioAudioProfile="${14}";
+	audioAudioSamplerate="${15}";
+	audioAudiobitrate="${16}";
+
+
+	for item in "${@:17}"; do
 
 		#	here is the found file
 		original_item=$item;
@@ -105,10 +111,11 @@ _process_video_recursive() {
 			if [ "$subtitles" = true ];
 				then
 					#	with subtitles
-					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audioAudioCodec" -profile:a "$audioAudioProfile" -pass 1 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+
 				else
 					#	without subtitles
-					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+					ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audioAudioCodec" -profile:a "$audioAudioProfile" -pass 1 -threads "$threads" -f "$filetype" "$print_file";
 			fi
 		fi;
 
@@ -140,8 +147,13 @@ _process_video_singleton () {
 		width="${11}";
 		subtitles="${12}"
 
+		audioAudioCodec="${13}";
+		audioAudioProfile="${14}";
+		audioAudioSamplerate="${15}";
+		audioAudiobitrate="${16}";
+
 		#	here is the found file
-		item=${13};
+		item=${17};
 		original_item=$item;
 
 		# add escape characters
@@ -187,10 +199,10 @@ _process_video_singleton () {
 		if [ "$subtitles" = true ];
 			then
 				#	with subtitles
-				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
+				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audioAudioCodec" -profile:a "$audioAudioProfile" -pass 1 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
 			else
 				#	without subtitles
-				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -c:a "$audiocodec" -preset "$preset" -b:v "$_the_videobitrate" -b:a "$audiobitrate" -ar "$audiosamplerate" -pass 1 -strict -2 -threads "$threads" -f "$filetype" "$print_file";
+				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audioAudioCodec" -profile:a "$audioAudioProfile" -pass 1 -threads "$threads" -f "$filetype" "$print_file";
 		fi
 
 }
@@ -387,31 +399,30 @@ fi;
 case "$quality" in
 	low)
 		videobitrate="190";
-		audiovideocodec="aac";
-		audiovideobitrate="256k";
-		audiosamplerate="44100";
+
+		audiovideobitrate="256k";		#	no longer used
+		audiosamplerate="44100";		#	no longer used
 		preset="medium";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
-		audioaudiobitrate="256k";
+		audioaudiobitrate="320k";
 		;;
 	medium)
 		videobitrate="215";
-		audiovideocodec="aac";
-		audiovideobitrate="256k";
-		audiosamplerate="44100";
+		audiovideobitrate="256k";		#	no longer used
+		audiosamplerate="44100";		#	no longer used
 		preset="slow";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
-		audioaudiobitrate="256k";
+		audioaudiobitrate="320k";
 		;;
 	high)
 		videobitrate="240";
-		audiovideocodec="aac";
-		audiovideobitrate="320k";
-		audiosamplerate="48000";
+
+		audiovideobitrate="320k";		#	no longer used
+		audiosamplerate="48000";		#	no longer used
 		preset="slow";
-		audioaudiosamplerate="44100";
+		audioaudiosamplerate="48000";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
 		;;
@@ -427,7 +438,7 @@ esac;
 
 #	global defaults
 filenameExtension="mkv";
-
+audiovideocodec="aac";	#	we don't use this anymore
 audioFilenameExtension="m4a";
 audioAudioCodec="libfdk_aac";
 audioAudioProfile="aac_he_v2";
@@ -472,9 +483,9 @@ if [ "$isAudio" = "false" ]; then
 	if [[ -d "$sourceInput" ]]; then
 		#	we have a directory
 		_utility_dot_clean "$sourceInput";
-		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_video_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "${my_array[@]}"; };
+		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_video_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$audioAudioCodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiobitrate" "${my_array[@]}"; };
 	elif [[ -f "$sourceInput" ]]; then
-		_process_video_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$sourceInput";
+		_process_video_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audiovideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$audioAudioCodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiobitrate" "$sourceInput";
 		#echo "bang";
 	else
 		echo "$sourceInput is not valid";
