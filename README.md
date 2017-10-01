@@ -12,3 +12,53 @@ Every video file will be compressed in HEVC, H265. So basically the same quality
 * -i (image width) - defaults to autosize to current size
 * -q (quality, low, medium, high) - defaults to low, which is pretty good IMO. 256k or greater audio quality.
 * -f (pass it a file path) - must be absolute path
+
+##	Building ffmpeg
+####	OS X
+`brew install --with-x265 --with-fdk-acc`
+####	Ubuntu 16.04
+`sudo apt-get -y install cifs-util tmux vim iotop iftop htop openvpn
+sudo apt-get -y install autoconf automake build-essential libass-dev libfreetype6-dev libtheora-dev libtool libvorbis-dev pkg-config texinfo zlib1g-dev
+sudo apt-get install -y libfdk-aac-dev
+sudo apt-get install -y libmp3lame-dev
+sudo apt-get install -y yasm
+sudo apt-get install -y libx264-dev libx265-dev libmp3lame-dev libopus-dev libvpx-dev
+
+sudo add-apt-repository ppa:jonathonf/ffmpeg-3
+apt-get install -y x264 x265;
+
+
+
+
+
+
+
+mkdir ~/ffmpeg_sources;
+cd ~/ffmpeg_sources
+wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
+tar xjvf ffmpeg-snapshot.tar.bz2
+cd ffmpeg
+PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure \
+--prefix="$HOME/ffmpeg_build" \
+--pkg-config-flags="--static" \
+--extra-cflags="-I$HOME/ffmpeg_build/include" \
+--extra-ldflags="-L$HOME/ffmpeg_build/lib" \
+--bindir="$HOME/bin" \
+--enable-gpl \
+--enable-libass \
+--enable-libfdk-aac \
+--enable-libfreetype \
+--enable-libmp3lame \
+--enable-libopus \
+--enable-libtheora \
+--enable-libvorbis \
+--enable-libvpx \
+--enable-libx264 \
+--enable-libx265 \
+--enable-nonfree
+PATH="$HOME/bin:$PATH" make
+make install
+make distclean
+hash -r
+`
+Then copy the files from ~/bin, to /usb/bin...
