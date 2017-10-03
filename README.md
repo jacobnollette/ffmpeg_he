@@ -1,4 +1,5 @@
-# ffmpeg-h265 - THIS IS RECURSIVE AUTOMATION
+# HE_FFMPEG_AUTOMATION
+##	THIS IS RECURSIVE & SINGLETON AUTOMATION
 
 Okay, this script operates in two modes right now, and only with h265 video.
 ####	Mode 1) Singleton mode - Pass it a single file, and it will create a print folder, and compress the file into the print folder... DONE.
