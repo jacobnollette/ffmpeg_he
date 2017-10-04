@@ -1,7 +1,7 @@
 # HE_FFMPEG_AUTOMATION
 ##	THIS IS RECURSIVE & SINGLETON AUTOMATION
 
-Okay, this script operates in two modes right now, and only with h265 video.
+Okay, this script operates in two modes right now. It works with video or audio. H265 for video, HE_AAC for audio.
 ####	Mode 1) Singleton mode - Pass it a single file, and it will create a print folder, and compress the file into the print folder... DONE.
 ####	Mode 2)	Recursive mode - Pass it a absolute path to a folder, and it will find all of the video files below, and create a print folder, organized exactly how your given folder is organized.
 
