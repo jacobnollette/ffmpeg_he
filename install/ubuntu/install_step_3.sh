@@ -1,9 +1,10 @@
 
 mkdir ~/ffmpeg_sources;
 cd ~/ffmpeg_sources
-wget http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
-tar xjvf ffmpeg-snapshot.tar.bz2
-cd ffmpeg
+wget http://ffmpeg.org/releases/ffmpeg-3.3.tar.xz;
+#tar xjvf ffmpeg-3.3.tar.xz;
+tar -xvf ffmpeg-3.3.tar.xz;
+cd ffmpeg-3.3;
 PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure \
 --prefix="$HOME/ffmpeg_build" \
 --pkg-config-flags="--static" \
