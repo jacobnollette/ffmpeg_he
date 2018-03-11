@@ -6,5 +6,5 @@ sudo apt-get install -y yasm
 sudo apt-get install -y libx264-dev libx265-dev libmp3lame-dev libopus-dev libvpx-dev
 
 sudo add-apt-repository ppa:jonathonf/ffmpeg-3
-apt-get install -y x264;
+apt-get install -y x264 x265;
 apt-get install -y bc;
