@@ -90,8 +90,8 @@ _process_video_recursive() {
 
 		# generate the recusive folder, based on given root
 		suffix_folder=$(echo $the_directory_of_the_file | awk -F "$rootItem" '{print $2}' );
-		#print_folder="$rootItem/print$suffix_folder";
-		print_folder="/home/hd1/jacobnollette/print$suffix_folder";
+		print_folder="$rootItem/print$suffix_folder";
+		#print_folder="/home/hd1/jacobnollette/print$suffix_folder";
 
 		#	this is the series folder, parent to season
 		#	not sure if we use this anymore...
