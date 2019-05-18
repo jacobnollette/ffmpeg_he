@@ -90,7 +90,7 @@ _process_video_recursive() {
 
 		# generate the recusive folder, based on given root
 		suffix_folder=$(echo $the_directory_of_the_file | awk -F "$rootItem" '{print $2}' );
-		print_folder="$rootItem/print$suffix_folder";
+		print_folder="$rootItem/print/$suffix_folder";
 		#print_folder="/home/hd1/jacobnollette/print$suffix_folder";
 
 		#	this is the series folder, parent to season
@@ -423,7 +423,7 @@ fi;
 
 case "$quality" in
 	low)
-		videobitrate="190";
+		videobitrate="450";
 
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
@@ -433,7 +433,7 @@ case "$quality" in
 		audioaudiobitrate="320k";
 		;;
 	medium)
-		videobitrate="215";
+		videobitrate="550";
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
 		preset="slow";
@@ -442,7 +442,7 @@ case "$quality" in
 		audioaudiobitrate="320k";
 		;;
 	high)
-		videobitrate="240";
+		videobitrate="600";
 
 		audiovideobitrate="320k";		#	no longer used
 		audiosamplerate="48000";		#	no longer used
@@ -471,7 +471,7 @@ audioVideoProfile="aac_he";
 
 
 filetype="matroska";
-videocodec="libx265";         # always h265
+videocodec="libx264";         # always h265
 threads=0;                    #unlimited threads
 
 
