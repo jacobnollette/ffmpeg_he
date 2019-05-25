@@ -271,7 +271,7 @@ _process_audio_recursive () {
 
 
 
-		print_folder="$rootItem/print$suffix_folder";
+		print_folder="$rootItem/print/$suffix_folder";
 		#echo $print_folder;
 
 		#echo $print_folder;
@@ -342,7 +342,7 @@ _process_audio_singleton () {
 	# generate the recusive folder, based on given root
 	#suffix_folder=$(echo $the_directory_of_the_file | sed "s@$rootItem@@g");
 	suffix_folder=$(echo $the_directory_of_the_file | tr -Ccu -s "$rootItem");
-	print_folder="$rootItem/print$suffix_folder";
+	print_folder="$rootItem/print/$suffix_folder";
 
 	#	this is the series folder, parent to season
 	#	not sure if we use this anymore...
