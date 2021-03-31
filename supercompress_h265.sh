@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#!/bin/bash
+
 _utility_readme() {
 	echo "-s subtitles(true / false)";
 	echo "-i image width (1920)";
@@ -425,9 +427,10 @@ fi;
 	# high - 240, audio 320k, bitrate 48000k
 
 
+
 case "$quality" in
 	low)
-		videobitrate="190";
+		videobitrate="210";
 
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
@@ -437,7 +440,7 @@ case "$quality" in
 		audioaudiobitrate="320k";
 		;;
 	medium)
-		videobitrate="215";
+		videobitrate="275";
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
 		preset="slow";
@@ -446,7 +449,7 @@ case "$quality" in
 		audioaudiobitrate="320k";
 		;;
 	high)
-		videobitrate="240";
+		videobitrate="350";
 
 		audiovideobitrate="320k";		#	no longer used
 		audiosamplerate="48000";		#	no longer used
@@ -476,7 +479,7 @@ audioVideoProfile="aac_he";
 
 filetype="matroska";
 videocodec="libx265";         # always h265
-threads=0;                    #unlimited threads
+threads=0;   
 
 
 
