@@ -230,30 +230,16 @@ fi;
 
 case "$quality" in
 	low)
-		videobitrate="600";
-
-		audiovideobitrate="256k";		#	no longer used
-		audiosamplerate="44100";		#	no longer used
-		preset="medium";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
 		;;
 	medium)
-		videobitrate="900";
-		audiovideobitrate="256k";		#	no longer used
-		audiosamplerate="44100";		#	no longer used
-		preset="slow";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
 		;;
 	high)
-		videobitrate="1700";
-
-		audiovideobitrate="320k";		#	no longer used
-		audiosamplerate="48000";		#	no longer used
-		preset="slow";
 		audioaudiosamplerate="48000";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
@@ -274,33 +260,13 @@ audioVideocodec="aac";	#	we don't use this anymore
 audioFilenameExtension="m4a";
 audioAudioCodec="libfdk_aac";
 audioAudioProfile="aac_he_v2";
-audioVideoProfile="aac_he";
-
-
-filetype="matroska";
-videocodec="libx264";         # always h265
-threads=0;                    #unlimited threads
 
 
 
-export -f _process_video_recursive;
-export -f _process_video_singleton;
-
-#	pass out root input as a variables
+#  pass out root input as a variables
 sourceInput="$files";
-#echo $sourceInput;
 
-export filenameExtension;
-export filetype;
-export videocodec;
-export audioVideocodec;
-export videobitrate;
-export audiovideobitrate;
-export audiosamplerate;
-export preset;
 export threads;
-export width;
-export subtitles;
 export sourceInput;
 
 #	audio
