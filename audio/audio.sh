@@ -109,7 +109,8 @@ _process_audio_recursive () {
 			audioBitrate="$7";
 			threads="$8"
 			echo "$original_item" > /tmp/ffmpeg_last
-			ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+			#ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+			ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" "$print_file";
 
 		fi;
 
@@ -181,7 +182,8 @@ _process_audio_singleton () {
 		audioBitrate="$7";
 		threads="$8"
 		echo "$original_item" > /tmp/ffmpeg_last
-		ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+		#ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
+		ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" "$print_file";
 
 	fi;
 
@@ -232,12 +234,12 @@ case "$quality" in
 	low)
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
-		audioaudiobitrate="320k";
+		audioaudiobitrate="192k";
 		;;
 	medium)
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
-		audioaudiobitrate="320k";
+		audioaudiobitrate="256k";
 		;;
 	high)
 		audioaudiosamplerate="48000";
@@ -256,9 +258,9 @@ esac;
 
 #	global defaults
 filenameExtension="mkv";
-audioVideocodec="aac";	#	we don't use this anymore
 audioFilenameExtension="m4a";
-audioAudioCodec="libfdk_aac";
+#audioAudioCodec="libfdk_aac";
+audioAudioCodec="aac";
 audioAudioProfile="aac_he_v2";
 
 
