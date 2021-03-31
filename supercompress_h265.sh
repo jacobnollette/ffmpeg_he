@@ -238,153 +238,7 @@ _process_video_singleton () {
 
 }
 
-_process_audio_recursive () {
-
-	rootItem="$1";
-	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
-
-	filenameExtension="$2";
-	audioCodec="$3";
-	audioProfile="$4";
-	audioSamplerate="$5";
-	audioChannels="$6";
-	audioBitrate="$7";
-	threads="$8"
-
-	for item in "${@:9}"; do
-
-		#	here is the found file
-		original_item=$item;
-		original_item="$( echo $item | sed -e 's/^"//' -e 's/"$//' )";
-
-		# add escape characters
-		item="$( echo "$item" | sed 's/ /\\ /g' )";
-
-		#	create proper file name, quotes will be needed
-		season_folder=`dirname "$item"`;
-
-		#	remove escape characters,- honestly I don't know why we had to do this
-		#	not sure if we use this anymore
-		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
-		season_folder="$( echo "$season_folder" | tr -d '"' )";
-
-		#	get filepath of the given item
-		the_directory_of_the_file=$(dirname "$original_item");
-
-		# generate the recusive folder, based on given root
-		#suffix_folder=$(echo $the_directory_of_the_file | tr -Ccu -s "$rootItem");
-		suffix_folder=$(echo $the_directory_of_the_file | awk -F "$rootItem" '{print $2}' );
-
-
-
-		print_folder="$rootItem/print/$suffix_folder";
-		#echo $print_folder;
-
-		#echo $print_folder;
-		#	this is the series folder, parent to season
-		#	not sure if we use this anymore...
-		season_root=`dirname "$original_item"`;
-
-		# get the filename without extension
-		filename=`basename "$original_item"`;
-		fn_no_extension=${filename%.*};
-
-		#generate print file
-		print_file="$print_folder/$fn_no_extension.";
-		print_file="$print_file$filenameExtension";
-
-		if [ ! -f "$print_file" ]; then
-
-			mkdir -p "$print_folder";
-
-			filenameExtension="$2";
-			audioCodec="$3";
-			audioProfile="$4";
-			audioSamplerate="$5";
-			audioChannels="$6";
-			audioBitrate="$7";
-			threads="$8"
-			echo "$original_item" > /tmp/ffmpeg_last
-			ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
-
-		fi;
-
-	done;
-
-}
-
-
-
-_process_audio_singleton () {
-
-	rootItem="$1";
-	rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
-
-	filenameExtension="$2";
-	audioCodec="$3";
-	audioProfile="$4";
-	audioSamplerate="$5";
-	audioChannels="$6";
-	audioBitrate="$7";
-	threads="$8"
-
-	item=${9};
-	original_item=$item;
-
-	# add escape characters
-	item="$( echo "$item" | sed 's/ /\\ /g' )";
-
-	#	create proper file name, quotes will be needed
-	season_folder=`dirname "$item"`;
-
-	#	remove escape characters,- honestly I don't know why we had to do this
-	#	not sure if we use this anymore
-	season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
-	season_folder="$( echo "$season_folder" | tr -d '"' )";
-
-	#	get filepath of the given item
-	the_directory_of_the_file=$(dirname "$original_item");
-
-	# generate the recusive folder, based on given root
-	#suffix_folder=$(echo $the_directory_of_the_file | sed "s@$rootItem@@g");
-	suffix_folder=$(echo $the_directory_of_the_file | tr -Ccu -s "$rootItem");
-	print_folder="$rootItem/print/$suffix_folder";
-
-	#	this is the series folder, parent to season
-	#	not sure if we use this anymore...
-	season_root=`dirname "$original_item"`;
-
-	# get the filename without extension
-	filename=`basename "$original_item"`;
-	fn_no_extension=${filename%.*};
-
-	#generate print file
-	print_file="$print_folder/$fn_no_extension.";
-	print_file="$print_file$filenameExtension";
-
-	#	create print folder
-	mkdir -p "$print_folder";
-
-	if [ ! -f "$print_file" ]; then
-
-		mkdir -p "$print_folder";
-
-		filenameExtension="$2";
-		audioCodec="$3";
-		audioProfile="$4";
-		audioSamplerate="$5";
-		audioChannels="$6";
-		audioBitrate="$7";
-		threads="$8"
-		echo "$original_item" > /tmp/ffmpeg_last
-		ffmpeg -i "$original_item" -vn -ar "$audioSamplerate" -ac "$audioChannels" -ab "$audioBitrate" -c:a "$audioCodec" -profile:a "$audioProfile" "$print_file";
-
-	fi;
-
-}
-
 #	defaults
-isAudio="false";
 subtitles='true';
 imagewidth='false';
 quality='low';
@@ -397,9 +251,8 @@ if [ $# -eq 0 ]
 		echo " ";
 		exit 1;
 fi
-while getopts ':s:i:q:f:a:' flag; do
+while getopts ':s:i:q:f:' flag; do
   case "${flag}" in
-		a) isAudio="${OPTARG}" ;;
     s) subtitles="${OPTARG}" ;;
     i) imagewidth="${OPTARG}" ;;
     q) quality="${OPTARG}" ;;
@@ -513,7 +366,6 @@ export audioaudiochannels;
 export audioaudiobitrate;
 
 
-if [ "$isAudio" = "false" ]; then
 	if [[ -d "$sourceInput" ]]; then
 		#	we have a directory
 		_utility_dot_clean "$sourceInput";
@@ -526,19 +378,3 @@ if [ "$isAudio" = "false" ]; then
 		echo "$sourceInput is not valid";
 		exit 1;
 	fi
-else
-	#	we're rocking audio
-	if [[ -d "$sourceInput" ]]; then
-		#	we have a directory
-		_utility_dot_clean "$sourceInput";
-		_utility_file_space_clear "$sourceInput";
-		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.3gp$|\.aa$|\.aac$|\.aax$|\.act$|\.aiff$|\.amr$|\.ape$|\.au$|\.awb$|\.dct$|\.dss$|\.dvf$|\.flac$|\.gsm$|\.iklax$|\.ivs$|/.m4a$|\.m4b$|\.m4p$|\.mmf$|\.mp3$|\.mpc$|\.msv$|\.ogg$|\.oga$|\.opus$|\.ra$|\.rm$|\.raw$|\.sln$|\.tta$|\.vox$|\.wav$|\.wma$|\.wv$|\.webm$|\.8svx$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_audio_recursive "$sourceInput" "$audioFilenameExtension" "$audioAudioCodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiochannels" "$audioaudiobitrate" "$threads" "${my_array[@]}"; };
-
-	elif [[ -f "$sourceInput" ]]; then
-		#	we have a file
-		_process_audio_singleton "$sourceInput" "$audioFilenameExtension" "$audioVideocodec" "$audioAudioProfile" "$audioaudiosamplerate" "$audioaudiochannels" "$audioaudiobitrate" "$threads" "$sourceInput";
-	else
-		echo "$sourceInput is not valid";
-		exit 1;
-	fi
-fi
