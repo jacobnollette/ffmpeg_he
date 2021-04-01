@@ -283,11 +283,11 @@ fi;
 
 case "$quality" in
 	low)
-		videobitrate="210";
+		videobitrate="275";
 
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
-		preset="medium";
+		preset="fast";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
@@ -296,13 +296,13 @@ case "$quality" in
 		videobitrate="275";
 		audiovideobitrate="256k";		#	no longer used
 		audiosamplerate="44100";		#	no longer used
-		preset="slow";
+		preset="medium";
 		audioaudiosamplerate="44100";
 		audioaudiochannels="2";
 		audioaudiobitrate="320k";
 		;;
 	high)
-		videobitrate="350";
+		videobitrate="300";
 
 		audiovideobitrate="320k";		#	no longer used
 		audiosamplerate="48000";		#	no longer used
