@@ -1,4 +1,11 @@
 # HE_FFMPEG_AUTOMATION
+
+# Pre-reqs
+- ffmpeg
+- bc
+- rename
+
+
 ##	THIS IS RECURSIVE & SINGLETON AUTOMATION
 
 install ffmpeg with homebrew; install scripts no longer work with catalina+
