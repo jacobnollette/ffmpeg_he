@@ -134,13 +134,13 @@ _process_video_recursive() {
 
 					#	with subtitles
 					echo "$original_item" > /tmp/ffmpeg_last
-					ffmpeg -y -i "$original_item" -max_muxing_queue_size 4096 -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -pix_fmt yuv422p -b:v "$_the_videobitrate" -preset "$preset" -acodec copy -c:s copy -threads "$threads" -f "$filetype" -strict -2 "$print_file";
+					ffmpeg -y -i "$orig" -max_muxing_queue_size 4096 -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -pix_fmt yuv444p -b:v "$_the_videobitrate" -preset "$preset" -acodec copy -c:s copy -threads "$threads" -f "$filetype" -strict -2 "$print_file";
 
 				else
 
 					#	without subtitles
 					echo "$original_item" > /tmp/ffmpeg_last
-					ffmpeg -y -i "$original_item" -max_muxing_queue_size 4096 -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -pix_fmt yuv422p -b:v "$_the_videobitrate" -preset "$preset" -acodec copy -threads "$threads" -f "$filetype" -strict -2 "$print_file";
+					ffmpeg -y -i "$original_item" -max_muxing_queue_size 4096 -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -pix_fmt yuv444p -b:v "$_the_videobitrate" -preset "$preset" -acodec copy -threads "$threads" -f "$filetype" -strict -2 "$print_file";
 				fi
 		fi;
 
