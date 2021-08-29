@@ -149,92 +149,6 @@ _process_video_recursive() {
 }
 
 
-_process_video_singleton () {
-
-		# pass it a season or group folder.
-		# it will go through the seasons, and process everything
-		# creates a print folder in the group folder.
-
-		#	here is our input folder;
-		rootItem="$1";
-		rootItem="$(dirname "$1")";
-		rootItemUgly="$( echo "$rootItem" | sed 's/ /\\ /g' )";
-
-		filenameExtension="$2";
-		filetype="$3";
-		videocodec="$4";
-		audiocodec="$5";
-		videobitrate="$6";
-		audiobitrate="$7";
-		audiosamplerate="$8";
-		preset="$9";
-		threads="${10}";
-		width="${11}";
-		subtitles="${12}"
-
-		audioAudioCodec="${13}";
-		audioAudioProfile="${14}";
-		audioAudioSamplerate="${15}";
-		audioAudiobitrate="${16}";
-
-		#	here is the found file
-		item=${17};
-		original_item=$item;
-
-		# add escape characters
-		item="$( echo "$item" | sed 's/ /\\ /g' )";
-
-		#	create proper file name, quotes will be needed
-		season_folder=`dirname "$item"`;
-
-		#remove escape characters,- honestly I don't know why we had to do this
-		season_folder="$( echo "$season_folder" | sed "s@\\\\@@g" )";
-
-		#	this is the series folder, parent to season
-		season_root=`dirname "$original_item"`;
-
-		print_folder="$season_root/print";
-
-		#	create print folder
-		mkdir -p "$print_folder";
-
-		# get the filename without extension
-		filename=`basename "$original_item"`;
-		fn_no_extension=${filename%.*};
-
-		#generate print file
-		print_file="$print_folder/$fn_no_extension.";
-		print_file="$print_file$filenameExtension";
-
-		#	video width
-		if ! [ -z ${width+x} ];
-			then
-				video_dimensions=$(_utility_video_dimensions "$original_item")
-				video_width=$( echo $video_dimensions | cut -d 'x' -f 1 );
-				width=$video_width;
-		fi;
-
-		# video bitrate calculator
-		bitratemultiplier=$(($width/480));
-		bitratemultiplier="$(_utility_round "$bitratemultiplier" "0")";
-		_the_videobitrate=$(($videobitrate * $bitratemultiplier));
-		_the_videobitrate="${_the_videobitrate}k";
-
-		#	if we have subtitles
-		if [ "$subtitles" = true ];
-			then
-
-
-				#	with subtitles
-				echo "$original_item" > /tmp/ffmpeg_last
-				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audiocodec" -ac 2 -af "pan=stereo|FL=FC+0.30*FL+0.30*BL|FR=FC+0.30*FR+0.30*BR" -profile:a "$audioAudioProfile" -pass 1 -c:s copy -threads "$threads" -f "$filetype" "$print_file";
-			else
-				#	without subtitles
-				echo "$original_item" > /tmp/ffmpeg_last
-				ffmpeg -y -i "$original_item" -vf scale="w=$width:trunc(ow/a/2)*2" -c:v "$videocodec" -preset "$preset" -b:v "$_the_videobitrate" -ar "$audioAudioSamplerate" -ab "$audioAudiobitrate" -c:a "$audiocodec"  -ac 2 -af "pan=stereo|FL=FC+0.30*FL+0.30*BL|FR=FC+0.30*FR+0.30*BR" -profile:a "$audioAudioProfile" -pass 1 -threads "$threads" -f "$filetype" "$print_file";
-		fi
-
-}
 
 
 
@@ -370,9 +284,6 @@ export audioaudiobitrate;
 		_utility_dot_clean "$sourceInput";
 		_utility_file_space_clear "$sourceInput";
 		find "$sourceInput" -type f -not -path "*/print*" | grep -E "\.MKV$|\.m2ts$|\.webm$|\.flv$|\.vob$|\.ogg$|\.ogv$|\.drc$|\.gifv$|\.mng$|\.avi$|\.mov$|\.qt$|\.wmv$|\.yuv$|\.rm$|\.rmvb$|/.asf$|\.amv$|\.mp4$|\.m4v$|\.mp4$|\.m?v$|\.svi$|\.3gp$|\.flv$|\.f4v$|\.mkv$" | cut -d ':' -f 1 | sed 's/.*/"&"/' | sort -n | { while read -r line || [[ -n "$line" ]]; do my_array=("${my_array[@]}" "$line"); done; _process_video_recursive "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audioVideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$audioAudioCodec" "$audioVideoProfile" "$audioaudiosamplerate" "$audioaudiobitrate" "${my_array[@]}"; };
-	elif [[ -f "$sourceInput" ]]; then
-		_process_video_singleton "$sourceInput" "$filenameExtension" "$filetype" "$videocodec" "$audioVideocodec" "$videobitrate" "$audiovideobitrate" "$audiosamplerate" "$preset" "$threads" "$width" "$subtitles" "$audioAudioCodec" "$audioVideoProfile" "$audioaudiosamplerate" "$audioaudiobitrate" "$sourceInput";
-		#echo "bang";
 	else
 		echo "$sourceInput is not valid";
 		exit 1;
