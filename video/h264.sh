@@ -250,7 +250,6 @@ threads=0;                    #unlimited threads
 
 
 export -f _process_video_recursive;
-export -f _process_video_singleton;
 
 #	pass out root input as a variables
 sourceInput="$files";
